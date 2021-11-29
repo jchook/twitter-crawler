@@ -1,0 +1,14 @@
+{
+  "name": "twitter-crawler",
+  "description": "Crawl Twitter with a real browser like Chrome or Firefox",
+  "packageManager": "yarn@3.1.1",
+  "devDependencies": {
+    "@types/node": "^16.11.10",
+    "@types/puppeteer": "^5.4.4",
+    "puppeteer": "^12.0.0",
+    "puppeteer-extra": "^3.2.3",
+    "ts-node": "^10.4.0",
+    "typedoc": "^0.22.10",
+    "typescript": "^4.5.2"
+  }
+}

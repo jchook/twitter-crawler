@@ -11,7 +11,7 @@ const HEADLESS = process.env.HEADLESS;
 
   try {
     // Get the path we want to access from the command line
-    const path = process.argv[2] || "search?q=how+to+crawl+twitter";
+    const path = process.argv[2] || "search?q=a+shrimp+fried+this+rice";
 
     browser = await PuppeteerExtra.launch({ headless: !!HEADLESS });
     const [page] = await browser.pages();

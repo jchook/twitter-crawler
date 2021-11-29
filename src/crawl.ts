@@ -12,7 +12,7 @@ export const crawlAllTweetsOptionsDefaults: CrawlAllTweetsOptions = {
   paginate: true,
   nextPageTimeout: 10000,
   nextPagePause: 500,
-  crawleedAttribute: "data-crawleed",
+  crawledAttribute: "data-crawled",
 };
 
 export interface CrawlAllTweetsOptions {

@@ -100,6 +100,7 @@ export async function* crawlAllTweets(
     const injected = yield tweets;
 
     // If the controller wants to stop, send in false
+    // TODO: make this an explicit Symbol, like signals.STOP_CRAWLING
     if (injected === false) {
       return;
     }
@@ -114,6 +115,9 @@ export async function* crawlAllTweets(
     await page.waitForNetworkIdle({
       timeout: opt.nextPageTimeout,
     });
+
+    // TODO: Does this quit too easily? Maybe it should do some scroll jiggers
+    // to get more tweets?
   }
 }
 

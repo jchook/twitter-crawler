@@ -1,5 +1,6 @@
 import PuppeteerExtra from "puppeteer-extra";
 import { crawlAllTweets } from "../crawl";
+import {getDateRanges} from "../search";
 
 
 (async () => {
@@ -14,11 +15,18 @@ import { crawlAllTweets } from "../crawl";
     try {
 
       // Get the path we want to access from the command line
-      const path = process.argv[2] || "search?q=a+shrimp+fried+this+rice";
+      // https://twitter.com/search?q=from%3ABrowtweaten%20since%3A2017-04-01%20until%3A2017-05-01
+      const username = process.argv[2] || 'Browtweaten'
+
+      // TODO figure out start date from the user's profile
+      const startDate = new Date('2017-04-01')
+
+      const ranges = getDateRanges(startDate, new Date())
+      const query = encodeURIComponent(`from:${username} since:${sinceStr} until:${untilStr}`);
       const [page] = await browser.pages()
 
       // Perform search
-      await page.goto("https://twitter.com/" + path, {
+      await page.goto("https://twitter.com/search?q=" + query, {
         waitUntil: "networkidle0",
       });
 
@@ -38,4 +46,5 @@ import { crawlAllTweets } from "../crawl";
   }
 
 })();
+
 

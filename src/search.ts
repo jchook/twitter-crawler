@@ -30,30 +30,32 @@ export const TWITTER_LAUNCH_DATE = new Date("2006-07-15");
  * totalSearches = bufferCoefficient * tweets / maxPerSearch
  *
  */
-export function guessRangeGranularity(
-  since: Date,
-  until: Date,
+export function guessDateRangeCount(
   tweetCount: number,
-  maxPerSearch: number = 49,
+  maxPerSearch: number = 50,
   bufferCoefficient = 2
 ): number {
-  return bufferCoefficient * tweetCount / maxPerSearch
+  return (bufferCoefficient * tweetCount) / maxPerSearch;
 }
 
-const TWO_DAYS = 1000*60*60*24*2
+const TWO_DAYS = 1000 * 60 * 60 * 24 * 2;
 
-export function getDateRanges(since: Date, until: Date, rangeCount: number) {
+export function getDateRanges(
+  since: Date,
+  until: Date,
+  dateRangeCount: number
+) {
   const ranges: [Date, Date][] = [];
   const duration = until.getTime() - since.getTime();
   if (duration <= 0) {
     return ranges;
   }
   if (duration < TWO_DAYS) {
-    return [[since, until]]
+    return [[since, until]];
   }
-  const interval = Math.floor(duration / rangeCount);
+  const interval = Math.floor(duration / dateRangeCount);
   let currentTime = since.getTime();
-  for (let ii = 0; ii < rangeCount - 1; ii++) {
+  for (let ii = 0; ii < dateRangeCount - 1; ii++) {
     ranges.push([new Date(currentTime), new Date(currentTime + interval)]);
     currentTime += interval;
   }

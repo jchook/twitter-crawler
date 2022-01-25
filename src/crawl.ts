@@ -1,4 +1,5 @@
 import { Page } from "puppeteer";
+import { TWITTER_LAUNCH_DATE } from "./search";
 
 const TWITTER_SEARCH = "https://twitter.com/search?q=";
 
@@ -23,8 +24,85 @@ export interface CrawlAllTweetsOptions {
   [key: string]: any;
 }
 
-export function err(message: string): boolean {
-  return process.stderr.write(message + "\n");
+export interface CrawlUserDetailsOptions {}
+
+export interface UserDetails {
+  displayName?: string;
+  location?: string;
+  signUpDate?: Date;
+  estimatedTotalTweets?: number;
+}
+
+export interface UserDetailsRaw {
+  displayName?: string;
+  location?: string;
+  signUpDate?: string;
+  estimatedTotalTweets?: string;
+}
+
+// Parse estimated tweet count
+// This function needs to live inside the page
+function parseEstimatedTweetTotal(est?: string): number | undefined {
+  if (!est) return undefined
+  const matches = est.match(/\s*([0-9\.,]+)([MK]?)\s*Tweets/);
+  if (!matches) {
+    return undefined;
+  }
+  const mainNum = parseFloat(matches[1].replace(",", ""));
+  const modifier = matches[2] || "";
+  if (modifier === "K") {
+    return 1000 * mainNum;
+  } else if (modifier === "M") {
+    return 1000000 * mainNum;
+  } else {
+    return mainNum;
+  }
+}
+
+export function parseUserDetails(details: UserDetailsRaw): UserDetails {
+  return {
+    ...details,
+    signUpDate: details.signUpDate ? new Date(details.signUpDate) : undefined,
+    estimatedTotalTweets: parseEstimatedTweetTotal(details.estimatedTotalTweets),
+  }
+}
+
+export async function crawlUserDetails(
+  page: Page,
+  options: Partial<CrawlUserDetailsOptions>
+) {
+  return await page.evaluate(() => {
+    // Display name
+    const displayName =
+      document.querySelector("main h2")?.textContent || undefined;
+
+    // Total tweets
+    const estimatedTotalTweets =
+      document.querySelector("main h2 + div")?.textContent || undefined;
+
+    // Header items
+    const userHeaderItems = document.querySelectorAll('[data-testid=UserProfileHeader_Items] > span')
+    let signUpDate: string | undefined
+    let userLocation: string | undefined
+    for (const headerItem of userHeaderItems) {
+      if (headerItem.getAttribute('data-testid') === 'UserLocation') {
+        userLocation = headerItem.textContent || undefined
+      } else {
+        const text = headerItem.textContent || ''
+        const matches = text.match(/Joined\s+(.+)/)
+        if (matches) {
+          signUpDate = matches[1]
+        }
+      }
+    }
+    const details: UserDetailsRaw = {
+      displayName,
+      location: userLocation,
+      estimatedTotalTweets,
+      signUpDate,
+    };
+    return details;
+  });
 }
 
 /**
@@ -139,4 +217,8 @@ export async function crawlSearchResults(
   const url = `${TWITTER_SEARCH}${query}`;
   await page.goto(url, { waitUntil: "networkidle0" });
   return await crawlTweets(page);
+}
+
+export function err(message: string): boolean {
+  return process.stderr.write(message + "\n");
 }

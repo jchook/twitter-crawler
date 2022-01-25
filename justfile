@@ -15,3 +15,6 @@ crawl path="":
 search query:
   yarn ts-node src/example/crawl-tweets.ts 'search?q={{query}}'
 
+user username:
+  yarn ts-node src/example/crawl-user-timeline.ts '{{username}}'
+
